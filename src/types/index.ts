@@ -58,7 +58,7 @@ export interface BodyLog {
 
 export type BodyData = Partial<Record<BodyPartId, BodyLog>>;
 
-export type AppState = 'intro' | 'scanning' | 'results';
+export type AppStep = 'intro' | 'picker' | 'scanning' | 'results';
 
 export interface ScanInput {
   bodyData: BodyData;
@@ -87,6 +87,11 @@ export interface CauseResult {
   probability: number;
   confidence: number;
   reasons: string[];
+  signals: {
+    regions: string[];
+    sensations: string[];
+    contexts: string[];
+  };
   recommendation: string;
   urgency: 'low' | 'moderate' | 'high';
 }
@@ -104,8 +109,6 @@ export interface RecommendationResponse {
   summary: string;
   recommendation: string;
 }
-
-// --- Guided Response & Pattern Insights ---
 
 export type InterventionType = 'breathing' | 'relaxation' | 'stretch' | 'somatic';
 

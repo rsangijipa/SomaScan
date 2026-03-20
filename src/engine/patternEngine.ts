@@ -1,11 +1,11 @@
-import { BodySession, BodyInsight, BodyPartId } from '../../types';
+import { getBodyPartLabel } from '@/body/bodyRegionMeta';
+import { BodySession, BodyInsight } from '@/types';
 
 export function analyzePatterns(sessions: BodySession[]): BodyInsight[] {
   if (sessions.length < 2) return [];
 
   const insights: BodyInsight[] = [];
-  const recentSessions = sessions.slice(-5); // Analyze last 5 sessions
-  const now = new Date();
+  const recentSessions = sessions.slice(-5);
 
   // 1. REPETITION & PERSISTENCE
   const partFrequency: Record<string, number> = {};
@@ -22,23 +22,23 @@ export function analyzePatterns(sessions: BodySession[]): BodyInsight[] {
 
   const persistentParts = Object.entries(partFrequency)
     .filter(([_, freq]) => freq >= 3)
-    .map(([part]) => part);
+    .map(([part]) => getBodyPartLabel(part as BodySession['parts'][number]));
 
   if (persistentParts.length > 0) {
     insights.push({
       type: 'persistence',
-      confidence: 0.85,
-      message: 'Padrão recorrente detectado em regiões específicas.',
-      suggestion: 'Observe se estas sensações surgem em horários ou atividades específicas.'
+      confidence: 0.82,
+      message: `As regioes ${persistentParts.slice(0, 2).join(' e ')} reapareceram em varios registros recentes.`,
+      suggestion: 'Vale observar o que costuma acontecer antes dessas marcacoes: postura, carga, sono ou ritmo do dia.'
     });
   }
 
   if (highIntensityCount >= 3) {
     insights.push({
       type: 'high_intensity',
-      confidence: 0.8,
-      message: 'Tensão persistente de alta intensidade identificada.',
-      suggestion: 'Considere aumentar a frequência das pausas para relaxamento preventivo.'
+      confidence: 0.76,
+      message: 'A intensidade media recente ficou alta em mais de um check-in.',
+      suggestion: 'Use pausas curtas com mais frequencia e veja se a intensidade cai antes do proximo registro.'
     });
   }
 
@@ -54,9 +54,9 @@ export function analyzePatterns(sessions: BodySession[]): BodyInsight[] {
   if (hasAnxietyPattern) {
     insights.push({
       type: 'anxiety_somatic',
-      confidence: 0.75,
-      message: 'Seu padrão indica uma possível relação entre qualidade do sono e sensações viscerais.',
-      suggestion: 'Pratique respiração diafragmática antes de dormir.'
+      confidence: 0.72,
+      message: 'Sono ruim apareceu junto de sinais no peito ou abdomen em sessoes recentes.',
+      suggestion: 'Se esse padrao se repetir, experimente reduzir estimulos e desacelerar a respiracao antes de dormir.'
     });
   }
 
@@ -68,9 +68,9 @@ export function analyzePatterns(sessions: BodySession[]): BodyInsight[] {
   if (hasStressPattern) {
     insights.push({
       type: 'stress_tension',
-      confidence: 0.78,
-      message: 'Seu corpo parece reagir ao estresse com tensão na região superior.',
-      suggestion: 'Tente soltar os ombros voluntariamente várias vezes ao dia.'
+      confidence: 0.75,
+      message: 'Quando o estresse sobe, a regiao superior do corpo tende a ser a primeira a responder.',
+      suggestion: 'Soltar ombros, nuca e respiracao em pausas curtas pode reduzir a recorrencia do padrao.'
     });
   }
 
@@ -83,11 +83,11 @@ export function analyzePatterns(sessions: BodySession[]): BodyInsight[] {
   if (hasOverloadPattern) {
     insights.push({
       type: 'mental_overload',
-      confidence: 0.7,
-      message: 'Sinais de sobrecarga mental detectados em sua cartografia somática.',
-      suggestion: 'Reserve momentos de silêncio absoluto, mesmo que breves.'
+      confidence: 0.68,
+      message: 'Cabeca, pescoco e peito apareceram juntos em mais de um registro, sugerindo sobrecarga acumulada.',
+      suggestion: 'Vale criar pequenos intervalos de silencio ou pausa de tela entre blocos intensos do dia.'
     });
   }
 
-  return insights.sort((a, b) => b.confidence - a.confidence).slice(0, 2);
+  return insights.sort((a, b) => b.confidence - a.confidence).slice(0, 3);
 }

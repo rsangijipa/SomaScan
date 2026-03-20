@@ -1,4 +1,4 @@
-import { CauseResult } from '../types';
+import { CauseResult } from '../src/types';
 import { ScoredCause } from './scoring/weightedEvidence';
 import { CAUSES } from './kb/causes';
 
@@ -25,6 +25,11 @@ export function normalizeScores(scoredCauses: ScoredCause[]): CauseResult[] {
       probability: Math.min(Math.round(rawProbability * 100) / 100, 1),
       confidence: calculateConfidence(sc, totalScore, scoreGap),
       reasons: sc.reasons,
+      signals: {
+        regions: Array.from(sc.signals.regions).slice(0, 3),
+        sensations: Array.from(sc.signals.sensations).slice(0, 3),
+        contexts: Array.from(sc.signals.contexts).slice(0, 3),
+      },
       recommendation: causeInfo?.recommendationTemplate || '',
       urgency: causeInfo?.urgency || 'low',
     };

@@ -1,27 +1,32 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Users, ChevronRight, Check, Info } from 'lucide-react';
+import { User, ChevronRight, Check, Info } from 'lucide-react';
+import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
 import { AvatarVariant, SexProfile, AvatarProfile } from './avatarTypes';
 
 interface AvatarWelcomePickerProps {
+  initialProfile?: AvatarProfile | null;
   onConfirm: (profile: AvatarProfile) => void;
+  onBack: () => void;
 }
 
-const GlassCard: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = "" }) => (
-  <div className={`relative overflow-hidden bg-white/75 backdrop-blur-[12px] border border-white/40 shadow-[0_40px_80px_rgba(0,0,0,0.05)] rounded-[3rem] ${className}`}>
+const GlassCard: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
+  <Card tone="emphasis" className={`relative overflow-hidden rounded-[2rem] ${className}`}>
     <div className="absolute top-0 left-0 right-0 h-px bg-white/60 opacity-80" />
     <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
     <div className="relative z-10 h-full">{children}</div>
-  </div>
+  </Card>
 );
 
-const AvatarWelcomePicker: React.FC<AvatarWelcomePickerProps> = ({ onConfirm }) => {
+const AvatarWelcomePicker: React.FC<AvatarWelcomePickerProps> = ({ initialProfile, onConfirm, onBack }) => {
   const [step, setStep] = useState<1 | 2>(1);
-  const [variant, setVariant] = useState<AvatarVariant>('man');
-  const [profile, setProfile] = useState<SexProfile>('unknown');
+  const [variant, setVariant] = useState<AvatarVariant>(initialProfile?.avatarVariant || 'man');
+  const [profile, setProfile] = useState<SexProfile>(initialProfile?.sexProfile || 'unknown');
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-8 bg-[#F5F5F3]/80 backdrop-blur-2xl">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 bg-[#F5F5F3]/82 backdrop-blur-2xl">
       <AnimatePresence mode="wait">
         {step === 1 ? (
           <motion.div 
@@ -31,26 +36,26 @@ const AvatarWelcomePicker: React.FC<AvatarWelcomePickerProps> = ({ onConfirm }) 
             exit={{ opacity: 0, y: -20 }}
             className="w-full max-w-4xl"
           >
-            <GlassCard className="p-16 lg:p-24">
+            <GlassCard className="p-8 sm:p-12 lg:p-20">
               <div className="text-center mb-16">
-                <span className="text-[10px] font-bold tracking-[0.4em] text-[#A8A8A8] uppercase mb-4 block">IDENTIDADE VISUAL</span>
-                <h2 className="text-7xl font-serif font-medium text-[#1F1F1F] tracking-tight mb-6">Escolha seu <br /><span className="italic text-[#A8A8A8] font-light">Avatar.</span></h2>
-                <p className="text-[#6B6B6B] text-sm font-light max-w-md mx-auto">Selecione a representação visual que melhor harmoniza com sua experiência para este mapeamento.</p>
+                <Badge>Identidade visual</Badge>
+                <h2 className="type-title mt-5 text-[clamp(2.8rem,7vw,4.6rem)]">Escolha seu <br /><span className="italic text-text-muted font-light">Avatar.</span></h2>
+                <p className="type-body mt-6 max-w-md mx-auto text-text-secondary">Selecione a representacao visual que melhor harmoniza com sua experiencia para este mapeamento.</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-10 mb-16">
+              <div className="grid grid-cols-1 gap-6 mb-12 sm:grid-cols-2 sm:gap-8 lg:gap-10 lg:mb-16">
                 {(['man', 'woman'] as AvatarVariant[]).map((v) => (
                   <button
                     key={v}
                     onClick={() => setVariant(v)}
                     className={`
-                      relative group p-12 rounded-[2.5rem] border transition-all duration-500 flex flex-col items-center gap-8
+                      relative group p-8 sm:p-10 rounded-[2rem] border transition-all duration-300 flex flex-col items-center gap-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-petrol
                       ${variant === v 
-                        ? 'bg-[#1F1F1F] border-[#1F1F1F] text-white shadow-2xl scale-105' 
-                        : 'bg-white border-stone-100 text-[#6B6B6B] hover:border-stone-200'}
+                        ? 'bg-accent-petrol border-accent-petrol text-white shadow-2xl scale-[1.02]' 
+                        : 'bg-white border-border-soft text-text-secondary hover:border-border-strong'}
                     `}
                   >
-                    <div className={`w-24 h-24 rounded-full flex items-center justify-center transition-colors ${variant === v ? 'bg-white/10 text-white' : 'bg-stone-50 text-[#A8A8A8]'}`}>
+                    <div className={`w-24 h-24 rounded-full flex items-center justify-center transition-colors ${variant === v ? 'bg-white/10 text-white' : 'bg-surface-secondary text-text-muted'}`}>
                       <User className="w-10 h-10" />
                     </div>
                     <span className="text-[12px] font-bold uppercase tracking-[0.3em] font-sans">
@@ -65,12 +70,24 @@ const AvatarWelcomePicker: React.FC<AvatarWelcomePickerProps> = ({ onConfirm }) 
                 ))}
               </div>
 
-              <button 
-                onClick={() => setStep(2)}
-                className="w-full h-24 bg-[#1F1F1F] text-white rounded-full font-bold tracking-[0.4em] text-[12px] flex items-center justify-center gap-6 shadow-xl hover:scale-[1.02] transition-all"
-              >
-                PROXÍMA ETAPA <ChevronRight className="w-5 h-5" />
-              </button>
+              <div className="flex gap-6">
+                <Button
+                  onClick={onBack}
+                  variant="secondary"
+                  size="lg"
+                  className="px-6 sm:px-10"
+                >
+                  Voltar
+                </Button>
+                <Button 
+                  onClick={() => setStep(2)}
+                  variant="primary"
+                  size="lg"
+                  className="flex-1"
+                >
+                  PROXÍMA ETAPA <ChevronRight className="w-5 h-5" />
+                </Button>
+              </div>
             </GlassCard>
           </motion.div>
         ) : (
@@ -81,23 +98,23 @@ const AvatarWelcomePicker: React.FC<AvatarWelcomePickerProps> = ({ onConfirm }) 
             exit={{ opacity: 0, y: -20 }}
             className="w-full max-w-4xl"
           >
-            <GlassCard className="p-16 lg:p-24">
+            <GlassCard className="p-8 sm:p-12 lg:p-20">
               <div className="text-center mb-16">
-                <span className="text-[10px] font-bold tracking-[0.4em] text-[#A8A8A8] uppercase mb-4 block">MODELO BIOLÓGICO</span>
-                <h2 className="text-7xl font-serif font-medium text-[#1F1F1F] tracking-tight mb-6">Fisiologia & <br /><span className="italic text-[#A8A8A8] font-light">Contexto.</span></h2>
-                <p className="text-[#6B6B6B] text-sm font-light max-w-md mx-auto">Esta informação auxilia o motor de inteligência a calibrar os pesos das hipóteses diagnósticas.</p>
+                <Badge>Modelo biologico</Badge>
+                <h2 className="type-title mt-5 text-[clamp(2.8rem,7vw,4.6rem)]">Fisiologia & <br /><span className="italic text-text-muted font-light">Contexto.</span></h2>
+                <p className="type-body mt-6 max-w-md mx-auto text-text-secondary">Esta informacao ajuda o motor local a calibrar os pesos das hipoteses com mais prudencia.</p>
               </div>
 
-              <div className="grid grid-cols-3 gap-6 mb-16">
+              <div className="grid grid-cols-1 gap-4 mb-12 sm:grid-cols-3 sm:gap-6 sm:mb-16">
                 {(['male', 'female', 'unknown'] as SexProfile[]).map((p) => (
                   <button
                     key={p}
                     onClick={() => setProfile(p)}
                     className={`
-                      relative group p-10 rounded-[2rem] border transition-all duration-500 flex flex-col items-center gap-6
+                      relative group min-h-[120px] p-6 sm:p-8 rounded-[2rem] border transition-all duration-300 flex flex-col items-center justify-center gap-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-petrol
                       ${profile === p 
-                        ? 'bg-[#1F1F1F] border-[#1F1F1F] text-white shadow-2xl scale-105' 
-                        : 'bg-white border-stone-100 text-[#6B6B6B] hover:border-stone-200'}
+                        ? 'bg-accent-petrol border-accent-petrol text-white shadow-2xl scale-[1.02]' 
+                        : 'bg-white border-border-soft text-text-secondary hover:border-border-strong'}
                     `}
                   >
                     <span className="text-[11px] font-bold uppercase tracking-[0.2em] font-sans text-center">
@@ -112,26 +129,30 @@ const AvatarWelcomePicker: React.FC<AvatarWelcomePickerProps> = ({ onConfirm }) 
                 ))}
               </div>
 
-              <div className="bg-stone-50/50 p-8 rounded-3xl border border-stone-100 mb-12 flex gap-6">
-                <Info className="w-6 h-6 text-[#A8A8A8] shrink-0" />
-                <p className="text-[11px] text-[#A8A8A8] leading-relaxed">
-                  Esta seleção altera apenas as probabilidades estatísticas internas (ex: ciclo menstrual, padrões hormonais). O mapa anatômico permanece universal.
+              <div className="bg-surface-secondary p-6 sm:p-8 rounded-3xl border border-border-soft mb-10 sm:mb-12 flex gap-4 sm:gap-6">
+                <Info className="w-6 h-6 text-text-muted shrink-0" />
+                <p className="type-small text-text-secondary">
+                  Esta selecao altera apenas as probabilidades estatisticas internas. O mapa anatomico continua universal.
                 </p>
               </div>
 
               <div className="flex gap-6">
-                <button 
+                <Button 
                   onClick={() => setStep(1)}
-                  className="h-24 px-12 border border-stone-200 text-[#A8A8A8] rounded-full font-bold tracking-[0.3em] text-[10px] hover:bg-stone-50 transition-all uppercase"
+                  variant="secondary"
+                  size="lg"
+                  className="px-6 sm:px-10"
                 >
                   Voltar
-                </button>
-                <button 
+                </Button>
+                <Button 
                   onClick={() => onConfirm({ avatarVariant: variant, sexProfile: profile })}
-                  className="flex-1 h-24 bg-[#1F1F1F] text-white rounded-full font-bold tracking-[0.4em] text-[12px] shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-6"
+                  variant="primary"
+                  size="lg"
+                  className="flex-1"
                 >
                   CONFIRMAR PERFIL <Check className="w-5 h-5" />
-                </button>
+                </Button>
               </div>
             </GlassCard>
           </motion.div>

@@ -1,4 +1,4 @@
-import { BodyPartId } from '../../types';
+import { BodyPartId } from '../../src/types';
 
 export interface BodyRegionInfo {
   id: BodyPartId;

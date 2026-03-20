@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { BodyPartId } from '../../types';
+import { BodyPartId } from '@/types';
 
 export type BodySide = 'front' | 'back';
 

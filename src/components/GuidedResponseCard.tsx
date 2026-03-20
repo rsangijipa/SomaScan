@@ -1,7 +1,10 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Wind, Activity, Layers, Anchor, X, Play } from 'lucide-react';
-import { GuidedResponse, InterventionType } from '../types';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import IconButton from '@/components/ui/IconButton';
+import { GuidedResponse, InterventionType } from '@/types';
 
 interface GuidedResponseCardProps {
   response: GuidedResponse;
@@ -26,7 +29,7 @@ const GuidedResponseCard: React.FC<GuidedResponseCardProps> = ({ response, onClo
       exit={{ y: 20, opacity: 0, scale: 0.95 }}
       className="w-full"
     >
-      <div className="relative overflow-hidden backdrop-blur-2xl bg-white/70 border border-white/50 rounded-[2.5rem] p-10 shadow-[0_30px_60px_rgba(0,0,0,0.05)]">
+      <Card tone="emphasis" className="relative overflow-hidden p-6">
         {/* Animated Background Pulse */}
         <motion.div 
           animate={{ scale: [1, 1.05, 1], opacity: [0.3, 0.5, 0.3] }}
@@ -41,29 +44,29 @@ const GuidedResponseCard: React.FC<GuidedResponseCardProps> = ({ response, onClo
                 <Icon className="w-6 h-6 text-graphite-dark" />
               </div>
               <div>
-                <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-graphite-light">Sugestão para o seu corpo</h4>
-                <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-graphite-dark/60">{config.label} &bull; {response.duration}s</span>
+                <h4 className="type-overline text-text-muted">Resposta guiada</h4>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-secondary">{config.label} • {response.duration}s</span>
               </div>
             </div>
-            <button 
+            <IconButton
               onClick={onClose}
-              className="p-2 text-graphite-light hover:text-graphite-dark transition-colors"
             >
               <X className="w-4 h-4" />
-            </button>
+            </IconButton>
           </div>
 
-          <h3 className="text-3xl font-serif text-graphite-dark mb-10 leading-snug italic">
+          <h3 className="mb-6 text-2xl font-serif leading-snug text-text-primary italic">
             "{response.message}"
           </h3>
 
           <div className="flex items-center justify-between mt-6">
-            <button 
+            <Button
               onClick={onClose}
-              className="flex items-center gap-3 px-8 py-4 bg-graphite-dark text-white rounded-full text-[10px] font-bold tracking-[0.2em] uppercase shadow-lg hover:scale-105 active:scale-95 transition-all"
+              variant="primary"
+              size="md"
             >
               <Play className="w-3 h-3 fill-current" /> Começar Agora
-            </button>
+            </Button>
             <div className="flex gap-2">
                {[1, 2, 3].map(i => (
                  <motion.div 
@@ -76,7 +79,7 @@ const GuidedResponseCard: React.FC<GuidedResponseCardProps> = ({ response, onClo
             </div>
           </div>
         </div>
-      </div>
+      </Card>
     </motion.div>
   );
 };

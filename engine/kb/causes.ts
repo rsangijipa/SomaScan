@@ -1,4 +1,4 @@
-import { CauseResult } from '../../types';
+import { CauseResult } from '../../src/types';
 
 export type CauseCategory = CauseResult['category'];
 

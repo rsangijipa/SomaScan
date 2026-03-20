@@ -1,5 +1,5 @@
 import { Engine } from 'json-rules-engine';
-import { ScanInput, BodyLog, BodyPartId } from '../../types';
+import { ScanInput } from '../../src/types';
 
 export const rulesEngine = new Engine();
 
@@ -25,7 +25,7 @@ rulesEngine.addRule({
   event: {
     type: 'RED_FLAG',
     params: {
-      message: 'Pressão no peito associada a sintomas sistêmicos. Atenção cardiovascular necessária.',
+      message: 'Pressao intensa no peito junto de sinais sistemicos pede avaliacao medica rapida para descartar um quadro agudo.',
       urgency: 'high',
     },
   },
@@ -42,7 +42,7 @@ rulesEngine.addRule({
   event: {
     type: 'RED_FLAG',
     params: {
-      message: 'Dor no peito com irradiação. Protocolo de alerta cardiovascular.',
+      message: 'Dor no peito com irradiacao merece avaliacao medica imediata, principalmente se estiver aumentando.',
       urgency: 'high',
     },
   },
@@ -65,7 +65,7 @@ rulesEngine.addRule({
   event: {
     type: 'RED_FLAG',
     params: {
-      message: 'Fraqueza associada a tontura e sintomas cervicais/cefálicos. Alerta neurológico.',
+      message: 'Fraqueza com tontura e sinais em cabeca ou pescoco merece avaliacao urgente para afastar alteracoes neurologicas relevantes.',
       urgency: 'high',
     },
   },
@@ -83,7 +83,7 @@ rulesEngine.addRule({
   event: {
     type: 'RED_FLAG',
     params: {
-      message: 'Febre associada a rigidez nucal grave. Risco de processo inflamatório agudo.',
+      message: 'Febre com rigidez importante no pescoco precisa de avaliacao medica no mesmo dia.',
       urgency: 'high',
     },
   },

@@ -1,4 +1,4 @@
-import { BodyPartId, SensationType, ContextTag } from '../../types';
+import { BodyPartId, SensationType, ContextTag } from '../../src/types';
 
 export interface CauseMapping {
   regions: Partial<Record<BodyPartId, number>>;

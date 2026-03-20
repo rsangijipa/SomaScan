@@ -1,4 +1,4 @@
-import { ContextTag } from '../../types';
+import { ContextTag } from '../../src/types';
 
 export interface SymptomInfo {
   id: ContextTag;

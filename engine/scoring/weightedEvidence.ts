@@ -1,6 +1,41 @@
-import { ScanInput, BodyLog, BodyPartId } from '../../types';
+import { getBodyPartLabel } from '../../src/body/bodyRegionMeta';
+import { ScanInput, BodyPartId, ContextTag, SensationType } from '../../src/types';
 import { MAPPINGS } from '../kb/mappings';
 import { CAUSES } from '../kb/causes';
+
+const contextLabels: Record<ContextTag, string> = {
+  stress: 'estresse',
+  anxiety: 'ansiedade',
+  poor_sleep: 'sono ruim',
+  poor_posture: 'ma postura',
+  computer_use: 'uso intenso de computador',
+  recent_exertion: 'esforco fisico recente',
+  after_meal: 'apos refeicao',
+  sedentary: 'sedentarismo',
+  repetitive_motion: 'movimento repetitivo',
+  injury_recent: 'lesao recente',
+  breathlessness: 'falta de ar',
+  nausea: 'nausea',
+  sweating: 'suor frio',
+  dizziness: 'tontura',
+  radiating_pain: 'dor irradiada',
+  fever: 'febre',
+  weakness: 'fraqueza',
+  palpitations: 'palpitacoes',
+};
+
+const sensationLabels: Record<SensationType, string> = {
+  tension: 'tensao',
+  heat: 'calor',
+  weight: 'peso',
+  neutral: 'neutralidade',
+  tingling: 'formigamento',
+  numbness: 'dormencia',
+  pain: 'dor',
+  burning: 'queimacao',
+  pressure: 'pressao',
+  stiffness: 'rigidez',
+};
 
 export interface ScoredCause {
   id: string;
@@ -8,6 +43,11 @@ export interface ScoredCause {
   reasons: string[];
   evidenceCount: number;
   primaryMatchCount: number;
+  signals: {
+    regions: Set<string>;
+    sensations: Set<string>;
+    contexts: Set<string>;
+  };
 }
 
 export function calculateBaseScores(input: ScanInput): ScoredCause[] {
@@ -17,6 +57,11 @@ export function calculateBaseScores(input: ScanInput): ScoredCause[] {
     reasons: [],
     evidenceCount: 0,
     primaryMatchCount: 0,
+    signals: {
+      regions: new Set<string>(),
+      sensations: new Set<string>(),
+      contexts: new Set<string>(),
+    },
   }));
 
   for (const causeId in MAPPINGS) {
@@ -42,9 +87,9 @@ export function calculateBaseScores(input: ScanInput): ScoredCause[] {
         // Sensation alignment boost
         if (sensationWeight > 0) {
           evidencePower *= (1 + sensationWeight * 0.5);
-          causeResult.reasons.push(`${log.label}: ${log.sensation} (Forte correlação)`);
+          causeResult.reasons.push(`${getBodyPartLabel(partId as BodyPartId)} com ${sensationLabels[log.sensation]} alinhado ao padrao principal`);
         } else {
-          causeResult.reasons.push(`${log.label}: ${log.sensation}`);
+          causeResult.reasons.push(`${getBodyPartLabel(partId as BodyPartId)} contribuiu com ${sensationLabels[log.sensation]}`);
         }
 
         // Intensity Boost: Non-linear boost for severe symptoms in matched regions
@@ -54,6 +99,8 @@ export function calculateBaseScores(input: ScanInput): ScoredCause[] {
 
         causeResult.score += evidencePower;
         causeResult.evidenceCount++;
+        causeResult.signals.regions.add(getBodyPartLabel(partId as BodyPartId));
+        causeResult.signals.sensations.add(sensationLabels[log.sensation]);
 
         if (primaryRegions.includes(partId as BodyPartId)) {
           causeResult.primaryMatchCount++;
@@ -66,16 +113,17 @@ export function calculateBaseScores(input: ScanInput): ScoredCause[] {
     if (primaryRegions.length > 1 && causeResult.primaryMatchCount >= 2) {
       const clusterMultiplier = 1 + (causeResult.primaryMatchCount / primaryRegions.length) * 0.5;
       causeResult.score *= clusterMultiplier;
-      causeResult.reasons.push('Padrão multirecional detectado (Consistência alta)');
+      causeResult.reasons.push('Padrao corporal recorrente em mais de uma regiao relevante');
     }
 
     // 3. Context Tags Score
     input.contextTags.forEach(tag => {
       const contextWeight = mapping.contexts[tag] || 0;
       if (contextWeight > 0) {
-        causeResult.score += contextWeight * 2; // Context is a strong primer
-        causeResult.reasons.push(`Contexto alinhado: ${tag}`);
+        causeResult.score += contextWeight * 1.8;
+        causeResult.reasons.push(`Contexto associado: ${contextLabels[tag]}`);
         causeResult.evidenceCount++;
+        causeResult.signals.contexts.add(contextLabels[tag]);
       }
     });
 

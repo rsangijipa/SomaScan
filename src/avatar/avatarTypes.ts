@@ -1,4 +1,4 @@
-import { BodyPartId } from '../types';
+import { BodyPartId } from '@/types';
 
 export type AvatarVariant = 'man' | 'woman';
 export type SexProfile = 'male' | 'female' | 'unknown';
@@ -9,4 +9,4 @@ export interface AvatarProfile {
 }
 
 export type BodyPartLabel = string;
-export { BodyPartId };
+export type { BodyPartId };
